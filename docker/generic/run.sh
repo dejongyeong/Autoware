@@ -5,9 +5,10 @@ XAUTH=/home/$USER/.Xauthority
 SHARED_DIR=/home/autoware/shared_dir
 HOST_DIR=/home/$USER/shared_dir
 
-if [ "$1" = "kinetic" ] || [ "$1" = "indigo" ]
+ROS_VERSION=${1:-"kinetic"}
+if [ "$ROS_VERSION" = "kinetic" ] || [ "$ROS_VERSION" = "indigo" ]
 then
-    echo "Use $1"
+    echo "Use $ROS_VERSION"
 else
     echo "Select distribution, kinetic|indigo"
     exit
@@ -32,4 +33,4 @@ nvidia-docker run \
     -u autoware \
     --privileged -v /dev/bus/usb:/dev/bus/usb \
     --net=host \
-    autoware-$1
+    gcr.io/auro-robotics/autoware-$ROS_VERSION
