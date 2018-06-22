@@ -36,7 +36,7 @@ chown -R ${DEV_USER}:${DEV_USER_GROUP} "/home/${DEV_USER}"
 
 # Adding devel_child_bashrc
 SCRIPT="/devel_child_bashrc.sh"
-PROFILE=$HOME/.bashrc
+PROFILE=/home/${DEV_USER}/.bashrc
 
 if grep -Fxq "source $SCRIPT" $PROFILE
 then
@@ -46,4 +46,4 @@ else
     echo "source $SCRIPT" >> $PROFILE
 fi
 
-source ~/.bashrc
+source /home/${DEV_USER}/.bashrc
