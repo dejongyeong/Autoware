@@ -42,7 +42,8 @@ pipeline {
           docker.withRegistry('https://gcr.io', 'gcr:auro-robotics') 
           {
             sh '''
-              cd docker/generic && docker build '''+env.DOCKER_BUILD_OPTS+''' -t gcr.io/auro-robotics/autoware .
+              docker pull  gcr.io/auro-robotics/autoware
+              cd docker/generic && docker build '''+env.DOCKER_BUILD_OPTS+''' --cache-from=gcr.io/auro-robotics/autoware:latest -t gcr.io/auro-robotics/autoware .
               docker push  gcr.io/auro-robotics/autoware
               docker rmi  gcr.io/auro-robotics/autoware
             '''
