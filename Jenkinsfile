@@ -35,15 +35,16 @@ pipeline {
 
       steps {
         script {
+          if ( params.NO_CACHE == true )
+            env.DOCKER_BUILD_OPTS = "--no-cache"
+          else
+            env.DOCKER_BUILD_OPTS = ""
           docker.withRegistry('https://gcr.io', 'gcr:auro-robotics') 
           {
-            if (params.NO_CACHE == true) env.DOCKER_BUILD_OPTS = "--no-cache"
-
             sh '''
-            echo Building image
-            docker build '''+env.DOCKER_BUILD_OPTS=+''' - t gcr.io / auro - robotics / autoware.
-            docker push gcr.io / auro - robotics / autoware: latest
-            docker rmi gcr.io / auro - robotics / autoware: latest 
+              docker build '''+env.DOCKER_BUILD_OPTS=+''' -t gcr.io/auro-robotics/autoware .
+              docker push  gcr.io/auro-robotics/autoware
+              docker rmi  gcr.io/auro-robotics/autoware
             '''
           }
         }
