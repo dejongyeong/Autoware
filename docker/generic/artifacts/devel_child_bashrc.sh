@@ -21,8 +21,6 @@ txtcyn="$(tput setaf 6)"  # Cyan
 if [ -f /.dockerenv ]; then
     echo "Inside Docker";
     export PS1="\[$txtcyn\] [in_docker] \[$txtrst\] $PS1"
-    #GIT_PROMPT_END="\[$txtcyn\] [in_docker] \[$txtrst\] \n \[\033[0;32m\] └─▶ \[\033[1;33m\] \u@\h  \n\[\033[0;0m\]\D{%F %I:%M:%S %P} \[\033[0;0m\]$"
-    #source /devel_artifacts/bash-git-prompt/gitprompt.sh
 else
     echo "Not inside Docker";
 fi
@@ -46,14 +44,6 @@ if ! shopt -oq posix; then
         . /etc/bash_completion
     fi
 fi
-
-echo "Setting up ROS Console"
-export ROSCONSOLE_FORMAT='[${severity}] [${time}]: ${logger}: ${message}'
-if [ ! -f ~/rosconsole.yaml ]; then
-    echo "~/rosconsole.yaml file missing, creating new"
-    cp /devel_artifacts/rosconsole.yaml ~/rosconsole.yaml
-fi
-export ROSCONSOLE_CONFIG_FILE=~/rosconsole.yaml
 
 
 source /opt/ros/kinetic/setup.bash
