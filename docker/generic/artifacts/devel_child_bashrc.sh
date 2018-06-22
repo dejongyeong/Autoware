@@ -20,9 +20,9 @@ txtcyn="$(tput setaf 6)"  # Cyan
 
 if [ -f /.dockerenv ]; then
     echo "Inside Docker";
-    #export PS1="\[$txtcyn\] 🐳 \[$txtylw\] $IMAGE_NAME   \[$txtrst\] \n \[\033[0;32m\] └─▶ $PS1"
-    GIT_PROMPT_END="\[$txtcyn\] 🐳 \[$txtylw\] $IMAGE_NAME   \[$txtrst\] \n \[\033[0;32m\] └─▶ \[\033[1;33m\] \u@\h  \n\[\033[0;0m\]\D{%F %I:%M:%S %P} \[\033[0;0m\]$"
-    source /devel_artifacts/bash-git-prompt/gitprompt.sh
+    export PS1="\[$txtcyn\] [in_docker] \[$txtrst\] $PS1"
+    #GIT_PROMPT_END="\[$txtcyn\] [in_docker] \[$txtrst\] \n \[\033[0;32m\] └─▶ \[\033[1;33m\] \u@\h  \n\[\033[0;0m\]\D{%F %I:%M:%S %P} \[\033[0;0m\]$"
+    #source /devel_artifacts/bash-git-prompt/gitprompt.sh
 else
     echo "Not inside Docker";
 fi
@@ -40,23 +40,27 @@ fi
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+        elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
 fi
 
 echo "Setting up ROS Console"
 export ROSCONSOLE_FORMAT='[${severity}] [${time}]: ${logger}: ${message}'
 if [ ! -f ~/rosconsole.yaml ]; then
-  echo "~/rosconsole.yaml file missing, creating new"
-  cp /devel_artifacts/rosconsole.yaml ~/rosconsole.yaml
+    echo "~/rosconsole.yaml file missing, creating new"
+    cp /devel_artifacts/rosconsole.yaml ~/rosconsole.yaml
 fi
 export ROSCONSOLE_CONFIG_FILE=~/rosconsole.yaml
 
 
 source /opt/ros/kinetic/setup.bash
+
+if [ -e ~/Autoware/ros/devel/setup.bash ] ; then
+    source ~/Autoware/ros/devel/setup.bash
+fi
 
 # Setting
 LANG=en_US.UTF-8
