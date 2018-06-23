@@ -69,7 +69,7 @@ pipeline {
         script {
           dir('docker/generic') 
           {
-            sh "docker build '''+${env.DOCKER_BUILD_OPTS}+''' --cache-from=gcr.io/auro-robotics/apollo:latest -t gcr.io/auro-robotics/${env.IMAGE_NAME} . "
+            sh "docker build ${env.DOCKER_BUILD_OPTS} --cache-from=gcr.io/auro-robotics/apollo:latest -t gcr.io/auro-robotics/${env.IMAGE_NAME} . "
           }
         }
       }
