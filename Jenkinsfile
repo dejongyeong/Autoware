@@ -8,18 +8,20 @@ pipeline {
   parameters {
     booleanParam(defaultValue: false, name: 'NO_CACHE', description: 'build docker images with no cache')
   }
+  environment {
+    IMAGE_NAME='autoware'
+  }
 
   stages {
     stage("setup and info") {
       steps {
-        env.IAMGE_NAME="autoware"
+       
         script {
           env.GIT_COMMIT_SHORT = sh(returnStdout: true, script: 'git rev-parse HEAD | cut -c 1-7').trim()
           env.GIT_COMMIT_AUTHOR = sh(returnStdout: true, script: 'git log --format="%aN" HEAD -n 1').trim()
           env.GIT_COMMIT_AUTHOR_EMAIL = sh(returnStdout: true, script: 'git log --format="%aE" HEAD -n 1').trim()
           env.GIT_COMMIT_AUTHOR_EMAIL_COMBINED = sh(returnStdout: true, script: 'git log --format="%aN<%aE>" HEAD -n 1').trim()
           env.GIT_COMMIT_SUBJECT = sh(returnStdout: true, script: 'git log --format="%s" HEAD -n 1').trim()
-
         }
         echo "\n \
         building on node ${env.NODE_NAME} \n \
@@ -49,7 +51,7 @@ pipeline {
             {
               try
               {
-                sh "docker pull  gcr.io/auro-robotics/${env.IAMGE_NAME}"
+                sh "docker pull  gcr.io/auro-robotics/${env.IMAGE_NAME}"
               }
               catch (exc) {
                 echo 'Pull failed'
@@ -67,7 +69,7 @@ pipeline {
         script {
           dir('docker/generic') 
           {
-            sh "docker build '''+${env.DOCKER_BUILD_OPTS}+''' --cache-from=gcr.io/auro-robotics/apollo:latest -t gcr.io/auro-robotics/${env.IAMGE_NAME} . "
+            sh "docker build '''+${env.DOCKER_BUILD_OPTS}+''' --cache-from=gcr.io/auro-robotics/apollo:latest -t gcr.io/auro-robotics/${env.IMAGE_NAME} . "
           }
         }
       }
@@ -78,8 +80,8 @@ pipeline {
         script {
           docker.withRegistry('https://gcr.io', 'gcr:auro-robotics') 
           {
-            sh "docker push  gcr.io/auro-robotics/${env.IAMGE_NAME} "
-            sh "docker rmi  gcr.io/auro-robotics/${env.IAMGE_NAME} "
+            sh "docker push  gcr.io/auro-robotics/${env.IMAGE_NAME} "
+            sh "docker rmi  gcr.io/auro-robotics/${env.IMAGE_NAME} "
           }
         }
       }
