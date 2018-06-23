@@ -12,6 +12,7 @@ pipeline {
   stages {
     stage("setup and info") {
       steps {
+        env.IAMGE_NAME="autoware"
         script {
           env.GIT_COMMIT_SHORT = sh(returnStdout: true, script: 'git rev-parse HEAD | cut -c 1-7').trim()
           env.GIT_COMMIT_AUTHOR = sh(returnStdout: true, script: 'git log --format="%aN" HEAD -n 1').trim()
@@ -31,28 +32,54 @@ pipeline {
       } //steps
     } //stage "setup and info"
 
-    stage("docker image") {
+    
+    stage("pull docker image") {
 
       steps {
         script {
           if ( params.NO_CACHE == true )
+          {
             env.DOCKER_BUILD_OPTS = "--no-cache"
+            echo 'Pull skipped due to --no-cache'
+          }
           else
+          {
             env.DOCKER_BUILD_OPTS = ""
+            docker.withRegistry('https://gcr.io', 'gcr:auro-robotics') 
+            {
+              try
+              {
+                sh "docker pull  gcr.io/auro-robotics/${env.IAMGE_NAME}"
+              }
+              catch (exc) {
+                echo 'Pull failed'
+              }
+            }
+          }
+            
+          
+        }
+      }
+    }
+    stage("build docker image") {
+
+      steps {
+        script {
+          dir('docker/generic') 
+          {
+            sh "docker build '''+${env.DOCKER_BUILD_OPTS}+''' --cache-from=gcr.io/auro-robotics/apollo:latest -t gcr.io/auro-robotics/${env.IAMGE_NAME} . "
+          }
+        }
+      }
+    }
+    stage("push docker image") {
+
+      steps {
+        script {
           docker.withRegistry('https://gcr.io', 'gcr:auro-robotics') 
           {
-            try
-            {
-              sh 'docker pull  gcr.io/auro-robotics/autoware' 
-            }
-            catch (exc) {
-              echo 'Pull cleanup'
-            }
-            sh '''
-              cd docker/generic && docker build '''+env.DOCKER_BUILD_OPTS+''' --cache-from=gcr.io/auro-robotics/autoware:latest -t gcr.io/auro-robotics/autoware .
-              docker push  gcr.io/auro-robotics/autoware
-              docker rmi  gcr.io/auro-robotics/autoware
-            '''
+            sh "docker push  gcr.io/auro-robotics/${env.IAMGE_NAME} "
+            sh "docker rmi  gcr.io/auro-robotics/${env.IAMGE_NAME} "
           }
         }
       }
